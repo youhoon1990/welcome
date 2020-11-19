@@ -27,3 +27,23 @@ ArrayList는 메모리를 배열보다 더 잡아먹어서 각각의 장단점�
 		snack.remove(2);
 		//전체 지우려면 
 		snack.clear();
+
+d1119
+Collection
+컬렉션에서 arraylist랑 linkedhashmap 정도 사용함
+
+Map은 키값과 속성값이 있다고 생각해(나중에 함)
+String은 <>  제네릭 안에 쓸 수 있음 (기본데이터가 아니라서)
+
+int 쓰고 싶으면 integer라는 wrapper클래스써야함?
+
+자바1.8 이상엔 <> 공백해도됨
+즉  ArrayList <String> list = new ArrayList<>();
+ArrayList <String> list = new ArrayList<String>();
+
+refactor(source탭아래있음) - extract method 하면  블록친부분 메소드화 가능
+
+자바익스플로러에서 java build path - libraries
+
+mp3.play(list.get(0).getPath());
+// 제네릭 > 객체번호써주고 > 그다음에 메소드까지 .뒤에 적을 수 있다

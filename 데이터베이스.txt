@@ -1,0 +1,189 @@
+일부칼럼은   프로젝션 기능
+조인	여러개의 데이터 테이블, n개이상의 테이블에서 검색
+
+*은 all이라는 뜻
+
+
+comlumn department_name format a17
+
+a17 알파벳자리수 말함
+
+comlumn department_name clear
+
+
+employees 테이블 모든 ㄷ데이터
+
+컴파일 3단계로 (검증, 실행계획, 
+
+SQL*Plus: Release 11.2.0.2.0 Production on 화 11월 17 10:01:21 2020
+
+Copyright (c) 1982, 2014, Oracle.  All rights reserved.
+
+SQL> conn system/12345
+Connected.
+SQL> alter user hr
+  2  identified by hr;
+
+User altered.
+
+SQL> alter user hr
+  2  account unlock;
+
+User altered.
+
+SQL> conn hr/hr
+Connected.
+SQL>
+
+숫자는 오른쪽     문자열는 왼쪽
+칼럼 헤딩들은 항상 대문자로 출력
+
+날짜는 +-가능  */불가능
+
+nvl 함null값 대체   null value language
+
+
+SELECT last_name, salary*12*nvl(commission_pct,1)  from employees;
+
+allias 는 공백보단 as 써주는게 성능적으로 좋음
+"" 쓰면 대소문자 섞임  즉 대문자로 안바뀜  그리고 복수 문장 쓰고 싶을때
+
+as와 "" 굳이 2개 붙여서 쓸 필요 없음
+select last_name || job_id AS "Employees" FROM employees;
+
+리터럴 문자열 (기억하면 좋음?)
+
+그중에서 문자열과 날자는 ''  싱글퍼테이션 반드시 찍어줘야함
+
+disctinct      중복제거      멀티플 중복제거도 가능
+
+2장 where절
+
+where 절이 select절 보다 먼저 실행되서  행이 제한된다고 보면 된다.
+
+연산자   <> 보다 !=가 더 빠름 성능적 측면
+where절에 있는 칼럼들은 셀렉문안에 넣어주는게 좋다
+
+between 은 date와 string 에도 모두가능하나 의미는 없다 
+
+d1118
+
+IN 연산자 = 복수연산자
+LIKE 연산자    %는 문장전체의미, _는 문자 하나를 의미함
+LKIKE 'S%'; 는 S가 들어가는 문장 전체
+%s% 는 s로시작하거나 끝나는 것
+
+null 연산자 >>  IS NULL;
+
+작년 정보처리 실기에 LIKE 나왔음
+조건이 여러개라면?  AND OR NOT 연산자
+칼럼 앞에 NOT 쓸수 잇음
+WHERE not department_id=90;
+
+ORDER BY 절 (정렬) 오름 VS 내림  ascending  descending  오름차순이 기본값
+ORDER BY NUMBER (이건 버그 같은 것  칼럼 숫자 말함 3넣으면 3번째 칼럼 정렬됨)
+ORDER BY 는 맨 마지막 줄이라 그 뒤에는 다른 명령어 불가
+널값 오름차순에선 마지막에   내림차순에는 처음에 (즉 값이 높다는 뜻?)
+
+ORDER BY 는 WHERE절과 다르게 ALLIAS 써도 알아먹음.
+
+
+SELECT last_name, salary*12 ANNSAL
+FROM employees
+ORDER BY department_id, salary*12 DESC
+
+// 멀티플 정렬이 됨  부서별로 되버림
+
+실습문제
+
+SELECT last_name
+FROM employees
+WHERE last_name like '%a%'  and last_name like  '%e%'
+/
+만약  %a%e% 로 하면 무조건  a e만 찾음    e a 는 못찾음
+
+d1119
+
+조인하려면
+where 절에  n-1에 해당하는 조건을 반드시 적어줘야함
+
+오라클 전용조인만 살펴봄(어차피 명령어만 다름)
+
+등가조인 : 데이터가 같을떄
+비등가 : 같은 데터 없을때
+아우터조인 : 어느 한쪽 데이터가 많을때
+포괄조인 : 등가조인의 확장형
+셀프조인 : 테이블 하나 (어렵다)
+
+from join에서도 allias 쓸 수 있다?
+
+select e.last_name, d.department_name, e.department_id
+from employees  e, departments  d
+where employees.department_id=departments.department_id
+/
+
+//혼용은 불가  from selec 둘다 allias 써라
+
+join 쓸 때  추가조건은 and써라  or쓰지마
+
+아우터조인
+select e.last_name, d.department_name, e.department_id
+from employees e, departments d
+where e.department_id = d.department_id(+)
+/
+
+//부족한쪽에 + 쓰면
+
+비등가조인 where e.salary between j.lowest_sal and j.highest_sal;
+대부분 between 씀   
+비등가조인은 자주쓰진 않음
+
+
+select e.last_name, d.department_name, d.location_id, l.city
+from employees e, departments d, locations l
+where  e.department_id = d.department_id
+and d.location_id = l.location_id
+and e.commission_pct is not null
+/
+
+
+
+select e.last_name, e.hire_date
+from employees e, employees m
+where e.manger_id = m.employee_id
+//////////////모르겠음
+
+
+
+
+
+
+
+
+//성능 측면 고려하면 조인을 먼저 쓰는 게 좋다. 
+
+근무사원번호, 이름, 관리자번호, 관리자이름 출력
+//자체참조
+
+select e.employee_id, e.last_name, e.manager_id, m.last_name
+from employees e, employees m
+where e.manager_id = m.employee_id
+/
+
+그룹함수 oracle은 7개
+sum 과 avg는 숫자데이터만 가능 
+max min 은 모든 데이터타입 가능
+그룹함수들은 null을 무시함  (즉 커미션 34명 받으면 34로나눔  전체사원으로 안나눔
+
+널값 고려하려면 nvl써라
+select avg(nvl(commission_pct,0)), sum(commission_pct)/107
+from employees
+/
+
+
+
+select count(distinct department_id)
+from employees
+/
+
+그룹함수는 all과 distinct 옵션 두개 사용가능  기본적으로 all이 default임
