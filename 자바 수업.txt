@@ -47,3 +47,51 @@ refactor(source탭아래있음) - extract method 하면  블록친부분 메소�
 
 mp3.play(list.get(0).getPath());
 // 제네릭 > 객체번호써주고 > 그다음에 메소드까지 .뒤에 적을 수 있다
+
+d1120
+메소드오버로딩
+
+부모클래스=슈퍼클래스    ,  자식클래스 == 서브클래스
+
+WheelMouse extends mouse{	}   << 상속하는법  extends 쓰며노딤   
+
+다중상속은 불가능하다
+모든 클래스는 java.lang.Object를 상속받는다.
+
+오버라이딩
+메소드 매개변수와 타입이 일치할것 , 메소드의 리턴타입도 일치할것
+
+@Override 그냥써줘라 오버라이딩 했다고 알려줌
+
+업캐스팅
+WildAnimal animal = null;  //널로 초기화
+animal = new WildAnimal(); //생성
+
+업캐스팅   : 하위클래스가 상위클래스 타입으로 자동타입변환하는 것 (다형성)
+
+WildAnimal animal = null;  //널로 초기화
+while (true) {
+			System.out.println("---동물 사냥법---");
+			System.out.println("[1]사자 [2]독수리 [3]늑대 [4]종료");
+			int menu = sc.nextInt();
+			
+			if(menu==1){
+				animal = new Lion();
+				
+			}else if(menu==2) {
+				animal = new Eagle();
+			}else if(menu==3) {
+				animal = new Wolf();
+			}else if(menu==4) {
+				System.out.println("종료되었습니다.");
+				break;
+				
+			}else {
+				animal = new WildAnimal();
+			}
+			animal.hunt();
+			
+
+		}
+
+접근제한자 protected는 상속관계에서만 사용가능 (다른패키지라도 상속이라면 접근가능)

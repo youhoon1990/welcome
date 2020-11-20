@@ -148,10 +148,6 @@ and e.commission_pct is not null
 
 
 
-select e.last_name, e.hire_date
-from employees e, employees m
-where e.manger_id = m.employee_id
-//////////////모르겠음
 
 
 
@@ -187,3 +183,172 @@ from employees
 /
 
 그룹함수는 all과 distinct 옵션 두개 사용가능  기본적으로 all이 default임
+
+d1120    250페이지
+select e.last_name, e.hire_date
+from employees e, employees m
+where e.manger_id = m.employee_id
+//////////////모르겠음
+
+
+hire_date가 더 빠른얘들 찾아라
+
+
+select department_id, avg(salary)
+from employees;  
+//오류남  그룹화시켜줘야함
+>>department_id 그룹화 시켜줘야함
+
+group by 절에 그룹화 안되는 그룹 꼭 명시 꼭해줘야 즉
+>>select department_id, avg(salary)
+from employees
+group by department_id
+/
+// 셀렉절에 deparrtmen_id 안써줘도 되나 그러면 보기 불편함
+
+
+
+select department_id, job_id, avg(salary)
+from employees
+group by department_id, job_id
+order by department_id
+/
+
+//department_id별로 그룹화 > 업무별 > 즉 그룹화가 2번 일어남
+셀렉트절에 있는 순서대로 그룹화가 시작됨
+
+
+select department_id, AVG(salary)
+from employees
+WHERE AVG(salary) >8000
+group by department_id, job_id
+/
+//오류남 where절이 먼저 실행되서 그룹제한이 안댐 즉 where이 아닌 
+having 으로 조건설정해줘야함
+
+having은 group에 대한 조건을 주는 것(where과 달리 나중에 실행됨 즉 avg 쓸수있음)
+where절은 행을 제한, having은 그룹을 제한하는 절
+having절과 group by절은 순서상관없음
+having sav(salary) >800 and     이거 쓰지마 (처리속도 느림)
+
+
+select department_id, MAX(salary)
+from employees
+group by department_id
+having MAX(salary)>10000
+order by department_id
+/
+
+// department 별 10000만 넘는 급여 중 최대값들 구함 
+
+select job_id, SUM(salary) PAYROLL
+FROM employees
+where job_id not like '%REP%'
+GROUP BY job_id
+HAVING SUM(salary) > 13000
+ORDER BY SUM(salary)
+/
+
+// from 절 > where절> group by절> selec절 > having절> order by절 순서로 처리
+
+select emp.last_name, emp.employee_id, emp.hire_date
+from employees emp, employees mgr
+where emp.manager_id
+
+
+
+회사 전체 쵀대 급여, 최소급여, 급여 총 합 및 평균 급여를 출력하시오
+select MAX(salary), MIN(salary), SUM(salary), AVG(salary)
+from employees
+/
+
+
+직업별 최대급여  최소급여 급여 총 합 및 평균 급여를 출력하시오
+단 최대 급여는 맥스, 최소급여는 nin, 급여 총합은 sum및 평균급여는 avg로 출력하고 직업을 오름차순으로 정렬하시오
+
+select job_id, MAX(salary) MAX,MIN(salary) MIN, SUM(salary) SUM, AVG(salary) AVG
+from employees
+group by job_id
+order by job_id
+/
+
+
+20번 문제   동일한 직업 가진 사원들의 총 수 
+
+select job_id, COUNT(employee_id)
+from employees
+group by job_id
+order by job_id
+/
+
+21번 매니저 근무하는 사원 총 수 
+
+22. 사내의 최대 급여 및 최소 급여의 차이
+select MAX(salary)-MIN(salary)
+
+23번  매니저의 사번 및 그 매니저 및 사원들 중 최소급여를 받는 사원의 급여를 출력하시오
+매니저가 없는 사람들은 제외한다
+최소 급여가 5000미만인 경우도 제외한다
+급여기준 역순으로 조회한다.
+
+select manager_id, min(salary)
+from employees
+where manager_id is not null
+group by manager_id
+having min(salary) >= 5000
+order by min(salary) desc
+/
+
+
+  1  select manager_id, min(salary)
+  2  from employees
+  3  where salary>5000
+  4  group by manager_id
+  5* having manager_id is not null
+SQL> /
+
+// 내가 낸 오답  위임
+
+24번 부서명 부서위치id 각부서별 사원 총수 , 각 부서별 평균 그병를 출력하되 부서위치를 오름차순으로
+
+select d.location_id,  count(e.department_id), AVG(e.salary), d.department_name
+from employees e, departments d
+where e.department_id = d.department_id
+group by   d.department_name, d.location_id
+order by d.location_id
+/
+
+>> order by 는   그룹함수 안쓴 모든 셀렉문을 써줘야함
+
+
+Q 아벨이라는 사원 급여보다 더 많은 급여를 받는 사원의 이름과 급여를 출력하시오
+(아벨 급여 검색 없이 한번에 처리하는 법) >> 서브쿼리
+
+select last_name, salary
+from employees
+where salary >(select salary
+		from employees 
+		where last_name = 'Abel')
+/
+
+
+서브쿼리는 먼저 실행됨  서브쿼리 실행 후 값을 메인쿼리로 넘겨줌 
+
+select   from  where having   등 거의 모든 문장에서 사용가능?
+where 과 having  부터 서브쿼리 배워보자
+
+where과 havaing 서브쿼리 안에 order by 쓸 필요 업다
+
+정렬은 메모리에서 처리함  즉 메모리 두번 차지함 게다가 할때마다 메모리 잡아먹음
+
+from 절에서 사용되는 order by 는 굉장히 중요함
+
+중요- 단일 행 서브 쿼리에는 단일 행 연산자를 사용합니다. 다중행 서브쿼리에는 다중 행 연산자를 사용합니다.
+
+
+select last_name, job_id
+from employees
+where job_id = (select job_id
+			from employees
+			where employee_id = 141)
+/
