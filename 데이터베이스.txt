@@ -272,8 +272,9 @@ group by job_id
 order by job_id
 /
 
-
-20번 문제   동일한 직업 가진 사원들의 총 수 
+연습 27
+이름에 u 들어가는 사원과 동일
+총 수 
 
 select job_id, COUNT(employee_id)
 from employees
@@ -352,3 +353,363 @@ where job_id = (select job_id
 			from employees
 			where employee_id = 141)
 /
+
+
+d1123
+
+서브쿼리 
+연산자를 잘쓰자.  단일쓸것인지
+
+서브쿼리가 널값을 반환하지 않게 주의할 것
+
+다중행 서브쿼리
+in
+>any (최소값 보다 큰 값 출력)
+<any (최대값 보다 작은값 출력)
+>all (최대값 보다 큰 값)
+<all (최소값 보다 작은 값)
+
+서브쿼리 잘쓰면 조인해결가능?
+ 
+
+
+ 1  SELECT employee_id, hire_date
+  2  from employees
+  3  where department_id  = (select department_id
+  4             from employees
+  5*            where last_name = 'Zlotkey')
+SQL> /
+
+
+
+실습  회사전체 평균급여보다 더 많이 받는 사원 이름과 사번 
+select last_name, employee_id
+from employees
+where salary > (select avg(salary)
+			from employees)
+/
+
+
+실습 27
+select last_name, employee_id
+from employees
+where department_id in (select department_id
+			from employees
+			where last_name like '%u%')
+/
+
+실습 28  시에틀 근무 사람 중  커미션 받지 않는 모든 사람들의 이름 부서명 지역 id
+
+내 제출
+select e.last_name, d.department_name, d.location_id
+from employees e, departments d
+where e.commission_pct is null
+and e.department_id = d.department_id
+/
+/
+
+select e.last_name, d.department_name, d.location_id
+from employees e, departments d
+where e.commission_pct is null
+and d.location_id = (select location_id
+		from locations
+		where city = 'Seattle')
+and e.department_id = d.department_id
+/
+
+
+
+
+
+실습 29  davies 사람보다 후에 고용된 사람들의 이름 및 고용일자를 역순으로 출력
+
+내제출
+select last_name, hire_date
+from employees
+where hire_date > (select hire_date
+		from employees
+		where last_name = 'Davies')
+order by hire_date
+/
+
+
+
+실습 30 king을 매니저로 두고 있는 모든
+ 사원 이름 및 급여
+
+
+내제출
+select e.last_name, e.salary, manager_id
+from employees e
+where manager_id in (select employee_id
+		from employees
+		where last_name = 'King')
+/
+
+실습 31 회사 전체의 평균 급여보다 더 많이 받는 사원들 중에 이름에 u가 있는 
+사원들이 근무하는 부서에서 근무하는 사원들의 사번 이름 및 급여를 출력하시오
+
+내 제출
+select last_name, salary
+from employees
+where salary > (select avg(salary)
+		from employees
+)
+and department_id in( select department_id
+			from employees
+			where last_name like '%u%')
+/
+
+
+
+
+select last_name, salary
+from employees
+where department_id in( select department_id
+			from employees
+			where last_name like '%u%'
+		and salary > (select avg(salary)
+		from employees)
+)
+/
+
+
+)
+/
+
+8장 dml
+트랜잭션에 영향 x   단순히 검색에만 미침 영향
+
+그러나 ddl  dcl    얘들은 오토커밋이 되버림
+
+insert delete 는 행단위 작업
+update 는 열단위 작업
+
+insert는 테이블의 맨 마지막 라인에 추가됨
+한번에 한 행만 추가됨  즉 100개 넣으려면  100번 인서트 해야 
+
+테이블 이름만 넣으면 
+인서트는 오류가 많다 
+
+인서트는 무결성 검사  1 컬럼 무결성  2. 제약조건 무결성
+
+셀렉만으로는 저장이 안된 것  트랜잭션 되야함  (저장ㅇ은 커밋   삭제는 롤백)
+
+널 값 입력은  암시적으로 하는 법과 직접 null 입력하는 것 둘다 가능
+(직접  입력하는 것이 선호됨)
+
+
+
+d1124
+select sysdate
+from dual;
+
+
+sysdate 는 꽤 많이 사용 됨 알고 있어라
+
+update 문장
+update에도 서브쿼리 사용가능   
+
+delete from 테이블이름
+where절은 선택사항  > 안쓰면 모든 행 삭제
+
+중요
+primary kye 는 중복키 insert불가
+update로  primary key  변경 불가  즉 테이블에  10을 50으로 바꾸는 것 불가 (자식테이블이 10번 pk를 참조하고 있다면 50이 없어도 불가)
+update  pk를  자식테이블에서 안쓰고 있다면 변경 가능
+
+delete  도  자식테이블에서 안쓰고 있으면 가능
+
+
+2개켜서 트랜잭션 서로 일어나면?
+select salary
+from employees
+where employee_id = 141
+/
+
+트랜잭션 진행
+update employees
+set salary = 30000
+where employee_id = 141;
+
+다른창에서  열어보면 3500 그대로 그리고 4000으로 고치면 깜빡깜빡함
+이 현상을 '읽기 일관성' 그리고 병행제어라고 정의함
+창1에서 30000 트랜잭션 중  창2에서 40000 입력하면 충돌
+창1을 방해하지 않게  1에 락걸고   창2가 40000고치는 것 못하게 함(창1의 작업이 끝날때까지 기다려)
+즉 창1에서 rollback 이나 commit 해주면 락풀리고  창2 진행가능
+
+
+
+
+9장 ddl  369p
+
+객체를 수정 생성 삭제 하는 것
+테이블, 뷰, 시퀀스, 인덱스, 동의어
+
+테이블 뷰 시퀀스   자주씀
+시퀀스    번호 생성기  중복되지않게
+
+테이블 이름 및 열 이름
+/문자로 시작할 것, 30자까지 가능 ,  특수문자는_$#만 가능
+
+create table 
+
+
+insert into dept
+values (20, 'ADMIN', '1800');
+
+데이터 유형  BFILE 은  외부에 파일 저장   내부에는 포인터만 저장
+데이터유형 VARCHAR  CHAR 차이  
+CHAR 는  미리 크기를 지정해버림  자기가 넣을 데이터보다 20~30퍼 크게 지정하는 것ㅇ ㅣ가낭 이상적임(성능우선시 그러나 공간의 낭비가 일어남) VARCHAR 은 공간활용도중시
+
+NUMBER,   NUMBER(P) <이건 정수,   NUMPER(P,S) < S는 소수점 자리수
+
+
+DATE는 문제가 많다
+TIMESTAMP 정도만 알아둬
+
+테이블에도 서브쿼리 사용가능
+
+create table dept80
+as	 select employee_id, 
+	last_name,
+	 salary*12 annasl,
+	 hire_date
+from employees
+where department_id = 80;
+
+문제 부서별 평균 급여를 저장하는 avgdept라는 테이블을 생성하시오
+단 부서번호는 DID, 평균급여는 AVGSAL로 생성하시오 
+
+
+  1  create table AVGDEPT
+  2  as select avg(salary) AVGSAL, department_id DID
+  3             from employees
+  4* group by department_id
+  5  /
+
+
+truncate table avgdept
+/
+
+select * from avgdept;
+
+
+insert into avgdept
+select department_id, avg(salary)
+from employees
+group by department_id
+/
+
+alter table 문 3가지 명령문 add, modify, drop
+modify 는 데이터 타입과 길이를 변경
+drop 컬럼 삭제할때 사용
+
+
+
+alter table dept
+add ( job_id varchar2(14)  )
+/
+>>칼럼추가
+
+
+insert into dept(job_id)
+values ('aa')
+/
+>>이렇게 하면 새행이 추가되버림
+
+update dept
+set job_id = 'aa'
+where deptno = 10
+/
+
+컬럼 데이터 추가시키는 행위 잘 안함 그냥 기능이 있다 정도만 알아둬라
+
+modify 
+
+alter table dept
+modify ( job_id varchar2(8) )
+/
+
+데이터타입변경은  데이타가 없을때만 가능    크기수정은 그냥 가능
+
+
+drop
+
+alter table dept
+drop column job_id
+/
+
+>>컬럼 삭제 ddl명령어는  실행과 동시에 오토커밋   복구안됌
+지금은 drop명령어 안씀  문제를 가지고 있음 
+
+drop은  data 뿐만 아니라 data dictionary 와 공간까지 삭제
+삭제 실행하면 dept 테이블 전체에 lock을 걸어버림
+
+동시성도 낮아서 현업에서는 사용 잘안함   대체명령어 쓰자
+
+unused 씀 
+
+alter table dept
+set unused (loc);
+
+dd에  loc 가  used 로 되있는 정보를 unsed로 바꿔주는 명령어임(data와 공간 남아있음)
+(drop은  data   ,  공간,  column 구조 까지 모두삭제)
+
+그러나 used로 바꾸는 명령어는 없다  (data와 공간이 남아있는데 이걸 지우는 방법은?)
+ 
+alter table dept
+drop unused column;    하면됨
+
+테이블 삭제
+drop table dept
+/
+
+employees이 참조하므로 삭제가 안됨
+
+테이블절단   turncated       (delete에서 where뺀것과 동일)
+
+delete 은  dhl    >> data 삭제   얘만 ROLLBACK가능   TRUNCATE와DROP은불가
+truncate 은ddl  >> data만 삭제
+drop   은   >> 얜 전부삭제
+
+단 DROP과 TURNCATE는 백업본이 있다면 복구가능
+DELETE는 행단위 삭제할때
+TRUNCATE는 전체삭제(디스크 조각들이 회수 됨  저장공간에 대한 성능 보장)
+
+정리 CREATE   , ALTER  ,  ADD, MODIFY, DROP COLUMN, DROP TABLE
+
+10장 제약조건  NOT NULL,  UNIQUE, PK,  FK, CHECK
+제약조건 : 무결성 보장 조건을 말함
+
+제약조건에 이름 지정않으면 무작위로 ORACLE 서버가 이름 생성함 
+그러나 무조건 만들어준다고 보면됨
+
+제약조건 생성시기   :  테이블 생성시, 또는 태이블생성후에
+
+CREATE table test
+( a number(3),
+b number(30),
+constraint test_a_pk	primary key (a));
+
+제약조건 선언은  constraint 제약조건이름 제약조건유형 (설치 column이름)
+즉 constraint   table_col_제약조건약어
+constraint test_a_pk	primary key (a);
+
+제약조건 여러개 가능 (조건마다 constraint 선언해줘야)(테이블레벨에서 선언)
+constraint test_a_pk	primary key (a), 
+constraint test_b_uk	unique (b)); 
+
+참조 constraint test_b_uk   이부분 생략가능 (그러나 생략 안쓰는게 좋음)
+
+또한 제약조건은  칼럼 옆에 바로 쓰기 가능(컬럼레벨에서 선언)
+CREATE table test
+( a number(3) constraint test_a_pk primary key,
+b number(30));
+
+우리는 테이블 레벨에서 제약조건 선언하자(가독성)
+
+
+SQL> create table smart(
+  2  id varchar2(20),
+  3  pw varchar2(20));

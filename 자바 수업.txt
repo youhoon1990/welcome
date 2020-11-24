@@ -95,3 +95,71 @@ while (true) {
 		}
 
 접근제한자 protected는 상속관계에서만 사용가능 (다른패키지라도 상속이라면 접근가능)
+
+
+d1123
+super 는 부모클래스  this는 자기 필드안에서
+
+업캐스팅 하면  데이터타입 달라도 배열에 넣을 수 있음
+즉 자식들 데이터 타입 다른데  부모클래스의 형태로 배열 만들 수 있음
+
+		Pokemon []포켓몬  = new Pokemon[3];						
+		Pokemon 꼬부기1 = new 꼬부기();
+		Pokemon 파이리1 = new 파이리();
+		Pokemon 피카츄1 = new 피카츄();
+
+만약 부모가 다른 디지몬과 피카츄를 묶어주려면?
+오브젝트 배열로 만들면 됨
+
+
+추상클래스   부모에서 개념만 빈칸 놔두고   자식에서 메소드 안만들면 오류뜸
+
+
+인터페이스는 메소드이름 강제하려고 쓰는 것
+api   app programming interface
+내일 jdbc 배움
+
+
+d1124
+인터페이스를 사용하는 가장 큰 이유는  igame에 추상화된 메소드가 있고  igame 받는 얘들은 반드시 메소드들 구체적으로 구현시켜야함
+
+상속은 extends로 선언 
+
+같은 클래스 내에서    >>  오버로딩
+상속받은 자식클래스에서 >> 오버라이딩
+
+jdbc (java database connectivity)
+aoo = app programming interface
+
+jdbc 연결순서
+1. jdbc driver 로딩    = 동적로딩
+2 database 연결
+3. sql문장실행
+4. 설치종료
+
+add external  - 오라클깔린곳에서 - product  - jdbc -  ojdbc6 추가
+
+		/*1. 동적로딩
+		 *1-1 ojdbc6.jar파일추가
+		 *1-2 Class.forName()으로 경로지정
+		우리가 사용할건 오라클드라이버.class
+		build path
+		add external  - 오라클깔린곳에서 - product  - jdbc -  ojdbc6 추가
+		Class.forName("Oracle.jdbc.driver.OracleDriver");
+		
+		*/
+
+try/catch
+
+	try {
+			Class.forName("Oracle.jdbc.driver.OracleDriver");
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+자바의 예외처리라고 함 try catch
+
+에러가 나면 콘솔창에 써줌  (캐치)
+
+sql 스크랩북 만듬
