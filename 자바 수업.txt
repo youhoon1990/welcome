@@ -163,3 +163,20 @@ try/catch
 에러가 나면 콘솔창에 써줌  (캐치)
 
 sql 스크랩북 만듬
+
+d1125
+
+Exception 만쓰면 코드는 깔끔해지나 시간이 오래거림   exception들은 모든 exception들의 부모
+
+catch (ClassNotFoundException | SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+
+
+테이블에 행이 업다면 오류생김 (rs.next())
+디자인패턴
+model view controller  
+view는  이용자들에게 보여지는 것들만
+model  데이터 주고받는 객체들
+	모델은 dao(data access object), dto(data transfer object)  2가지 있다?

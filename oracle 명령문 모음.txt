@@ -1,0 +1,39 @@
+행삽입
+
+insert into dept (행이름)
+values (값들)
+/
+
+insert into dept (deptno, dname, loc)
+values (20, 'Marketing', 1800)
+/
+
+행갱신
+update 테이블이름 
+set sal = 바꿀값(이값으로바뀜)
+where 칼럼명 = 찾을값(이조건에 합치하는 행)
+
+update emp
+set sal = 9000
+where empno = 103;
+
+행삭제
+delete from dept
+where deptno = 30;
+
+delete from 테이블
+where 조건칼럼 = 값;
+
+(where 안 넣으면 테이블 모든 행이 삭제됨)
+
+
+alter table dept
+add constraint dept_deptno_pk primary key(deptno);
+
+alter table emp
+add constraint emp_empno_pk primary key(empno);
+	
+alter table emp
+add constraint emp_deptno_fk
+	foreign key(deptno)
+	references dept (deptno);

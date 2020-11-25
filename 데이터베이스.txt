@@ -707,9 +707,183 @@ CREATE table test
 ( a number(3) constraint test_a_pk primary key,
 b number(30));
 
-우리는 테이블 레벨에서 제약조건 선언하자(가독성)
+우리는 테이블 레벨에서 제약조건 선언하자(가독성)(not null은 그냥 칼럼레벨에서 하는게보통)
 
 
 SQL> create table smart(
   2  id varchar2(20),
   3  pw varchar2(20));
+
+d1125
+
+D:\app\oracle\product\11.2.0\server\bin
+
+복습 modify 사이즈변경 가능   베이터타입 변경불가(이미 데이터가 있다면)
+drop보다는 set unused사용함
+trncate 테이블 삭제가능
+
+not null은  constraint 생략 가능
+
+create table employees(
+	employee_id number(6),
+	lastname
+
+unique 제약조건
+
+create table employees(
+	employee_id number(6),
+	lastname varchar2 (25) not null,
+
+	constraint 
+
+foreign key는 참조대상지정을 해줘야함(references departments (department_id)
+fk는 칼럼과 타입 적는데 칼럼은 달라도 되지만 데이터 타입과 길이가 반드시 같아야함
+
+fk 제약조건    references,  
+ on delete cascade    : 자식테이블 데이터도 동시 삭제됨 (앞에서 set 배운 것과는 다르게)
+cascade는 자식까지다 삭제, 레퍼런스는 종속적 삭제 안됌 , set null은 부모삭제  자식은 null로 대체됨
+
+alter table	 employees
+add constraint	emp_manager_fk
+	foreign key (namager_id)
+	references employees (employee_id);
+
+not null은 modify 명령어 사용,     pk  fk ck uk는 테이블레벨 선언 방식으로 추가
+
+제약조건 삭제 
+casecade는 강력한 명령어 (종속된 것까지 삭제하라)
+
+실습 진행
+
+@test.sql
+
+
+drop table test cascade constraints;  
+//이거쓰면 다 지워짐
+create table test
+(a number(3),
+ b number(3) not null,
+ c number(3),
+ constraint test_a_pk primary key(a)
+);
+
+create table test1 
+(d number(3),
+ e number(3),
+ a number(3),
+ constraint test1_d_pk primary key(d),
+ constraint test1_a_fk foreign key(a) references test(a)
+);
+
+
+@sample,sql 
+>> 이거로 생성
+
+
+create table EMP
+(EMPNO number(4),
+ ENAME varchar2(10),
+ JOB varchar2(9),
+ MGR number(4),
+ HIREDATE DATE,
+ SAL number(7, 2),
+ COMM number(7, 2),
+ DEPTNO number(2)
+ );
+
+
+insert into dept (deptno, dname, loc)
+values (20, 'Marketing', 1800)
+/
+
+
+update emp 갱신
+  2  set sal = 9000
+  3  where empno = 103;
+
+
+
+pk fk 설정
+alter table dept
+add constraint dept_deptno_pk primary key(deptno);
+
+alter table emp
+add constraint emp_empno_pk primary key(empno);
+	
+alter table emp
+add constraint emp_deptno_fk
+	foreign key(deptno)
+	references dept (deptno);
+
+
+2권 들어감 
+뷰 15p
+사용하기 쉽지 않을 수 있다
+
+데이터 엑세스 제한  (10번 부서 얘들은  10번 부서 정보만 보이게)
+
+뷰 종류 단순뷰와 복합 뷰 있음
+
+
+뷰 생성은 create view
+	as 서브쿼리로만 생성가능
+
+create view empvu80
+ as select employee_id, last_name, salary
+	from employees
+	where department_id = 80;
+
+
+create view empvu50
+ as select employee_id ID_NUMBER, last_name NAME, salary*12 ANN_SALARY
+	from employees
+	where department_id = 50;
+
+
+테이블은 실제 공간을 할당받음
+뷰는 물리적인 구조가 없다 dd에 보관하다가 그냥 재실행함 테이블인것처럼
+
+뷰 장점 (성능보다는   보안이나  편의성-복잡한질의 빠르게 볼 수 있음)
+뷰 는 alter가 없고  create or replace view 로 덮어쓰는 척함
+
+from절에서도 서브쿼리가능(인라인 뷰라고 부름)
+
+2권 35p
+
+우리회사에 근무하는 사원중 급여를 적게 받는 하위 3명의 이름과 급여
+
+select rownum, salary, last_name
+from (select last_name, salary
+	from employees
+	order by salary)
+where rownum <4
+
+인라인뷰에서는 오더바이절이 굉장히 중요한 역할
+부서별 평균급여가 많은 상위 3개 부서번호와 평균급여를 출력하시오
+
+
+select rownum, department_id, avgsal
+from (select department_id, avg(salary) avgsal
+	from employees 
+	group by department_id
+	order by avgsal desc)
+where rownum <4;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
